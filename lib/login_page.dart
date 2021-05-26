@@ -9,7 +9,6 @@ import 'tab_page.dart';
 class LoginPage extends StatelessWidget {
   // 구글 로그인을 위한 객체
   final GoogleSignIn _googleSignIn = GoogleSignIn();
-
   // 파이어베이스 인증 정보
   final FirebaseAuth _auth = FirebaseAuth.instance;
 

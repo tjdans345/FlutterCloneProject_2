@@ -1,12 +1,13 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import 'feed_widget.dart';
 
 class HomePage extends StatelessWidget {
-//  final FirebaseUser user;
+  final FirebaseUser user;
 
-//  HomePage(this.user);
+  HomePage(this.user);
 
   @override
   Widget build(BuildContext context) {
@@ -53,15 +54,15 @@ class HomePage extends StatelessWidget {
                         width: 80.0,
                         height: 80.0,
                         child: CircleAvatar(
-                          backgroundImage: NetworkImage(''),
+                          backgroundImage: NetworkImage(user.photoUrl),
                         ),
                       ),
                       Padding(padding: EdgeInsets.all(8.0)),
                       Text(
-                        'test@test.com',
+                        user.email,
                         style: TextStyle(fontWeight: FontWeight.bold),
                       ),
-                      Text('test 유저'),
+                      Text(user.displayName),
                       Padding(padding: EdgeInsets.all(8.0)),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.center,
@@ -127,5 +128,4 @@ class HomePage extends StatelessWidget {
       children: List.generate(10, (i) => i).map((doc) => FeedWidget()).toList(),
     );
   }
-  
 }
