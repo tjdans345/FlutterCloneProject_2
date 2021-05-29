@@ -26,7 +26,7 @@ class _FeedWidgetState extends State<FeedWidget> {
 
   @override
   Widget build(BuildContext context) {
-    var commentCount = widget.document['comment'] ?? 0;
+    var commentCount = widget.document['commentCount'] ?? 0;
     return Column(
       children: <Widget>[
         ListTile(
@@ -195,5 +195,27 @@ class _FeedWidgetState extends State<FeedWidget> {
   }
 
   // 댓글 작성
-  void _writeComment(String text) {}
+  void _writeComment(String text) {
+    final data = {
+      'writer': widget.user.email,
+      'comment': text,
+    };
+
+    // 댓글 추가
+    Firestore.instance
+        .collection('post')
+        .document(widget.document.documentID)
+        .collection('comment')
+        .add(data);
+
+    final upadateData = {
+      'lastComment': text,
+      'commentCount': (widget.document['commentCount'] ?? 0) + 1,
+    };
+
+    Firestore.instance
+        .collection('post')
+        .document(widget.document.documentID)
+        .updateData(upadateData);
+  }
 }
