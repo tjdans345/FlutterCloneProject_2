@@ -1,3 +1,4 @@
+import 'package:chapter10/detail_post_page.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -47,7 +48,7 @@ class SearchPage extends StatelessWidget {
                   crossAxisSpacing: 1.0),
               itemCount: snapshot.data.documents.length,
               itemBuilder: (BuildContext context, int index) {
-                return _buildListItem(snapshot.data.documents[index]);
+                return _buildListItem(context, snapshot.data.documents[index]);
               },
             );
           }),
@@ -57,16 +58,29 @@ class SearchPage extends StatelessWidget {
         onPressed: () {
           print('눌림');
           Navigator.of(context).push(MaterialPageRoute(
-              builder: (BuildContext context) => CreatePage()));
+              builder: (BuildContext context) => CreatePage(user)));
         },
       ),
     );
   }
 
-  Widget _buildListItem(DocumentSnapshot document) {
-    return Image.network(
-      document['photo'],
-      fit: BoxFit.cover,
+  Widget _buildListItem(BuildContext context, DocumentSnapshot document) {
+    return Hero(
+      tag: document.documentID,
+      child: Material(
+        child: InkWell(
+          onTap: () {
+            Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (context) => DetailPostPage(document, user)));
+          },
+          child: Image.network(
+            document['photo'],
+            fit: BoxFit.cover,
+          ),
+        ),
+      ),
     );
   }
 }
