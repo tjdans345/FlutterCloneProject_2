@@ -1,18 +1,15 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 import 'comment_page.dart';
 
 class FeedWidget extends StatefulWidget {
-  final document = {
-    'userPhotoUrl': '',
-    'email': 'test@test.com',
-    'displayName': '더미',
-    'comment': 100,
-  };
+  final DocumentSnapshot document;
 
-//  final FirebaseUser user;
+  final FirebaseUser user;
 
-//  FeedWidget(this.document, this.user);
+  FeedWidget(this.document, this.user);
 
   @override
   _FeedWidgetState createState() => _FeedWidgetState();
@@ -43,7 +40,7 @@ class _FeedWidgetState extends State<FeedWidget> {
           trailing: Icon(Icons.more_vert),
         ),
         Image.network(
-          widget.document['photoUrl'],
+          widget.document['photo'],
           height: 300,
           width: double.infinity,
           fit: BoxFit.cover,
@@ -91,7 +88,7 @@ class _FeedWidgetState extends State<FeedWidget> {
             SizedBox(
               width: 8.0,
             ),
-            Text(widget.document['contents']),
+            Text(widget.document['content']),
           ],
         ),
         SizedBox(
@@ -119,7 +116,7 @@ class _FeedWidgetState extends State<FeedWidget> {
                     ),
                   ],
                 ),
-                Text(widget.document['lastComment']),
+                Text(widget.document['lastComment'] ?? ''),
               ],
             ),
           ),
@@ -150,13 +147,19 @@ class _FeedWidgetState extends State<FeedWidget> {
 
   // 좋아요
   void _like() {
+    // 기존 좋아요 리스트 가져오기
+    final List likedUsers =
+        List<String>.from(widget.document['likedUsers'] ?? []);
+
+    // 나를 추가
+    likedUsers.add(widget.user.email);
+
+    // 업데이트 할 항목을 문서로 준비
   }
 
   // 좋아요 취소
-  void _unlike() {
-  }
+  void _unlike() {}
 
   // 댓글 작성
-  void _writeComment(String text) {
-  }
+  void _writeComment(String text) {}
 }

@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -90,27 +91,68 @@ class AccountPage extends StatelessWidget {
         ),
         Padding(
           padding: const EdgeInsets.only(top: 8.0),
-          child: Text(
-            '0\n게시물',
-            textAlign: TextAlign.center,
-            style: TextStyle(fontSize: 18.0),
-          ),
+          child: StreamBuilder<QuerySnapshot>(
+              stream: _postStram(),
+              builder: (context, snapshot) {
+                var post = 0;
+                if (snapshot.hasData) {
+                  post = snapshot.data.documents.length;
+                }
+
+                return Text(
+                  '$post\n게시물',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(fontSize: 18.0),
+                );
+              }),
         ),
         Padding(
           padding: const EdgeInsets.only(top: 8.0),
-          child: Text(
-            '0\n팔로워',
-            textAlign: TextAlign.center,
-            style: TextStyle(fontSize: 18.0),
-          ),
+          child: StreamBuilder<DocumentSnapshot>(
+              stream: _followerStream(),
+              builder: (context, snapshot) {
+                var follower = 0;
+                if (snapshot.hasData) {
+                  print(snapshot.data.data.length);
+                  var filteredMap;
+                  if (snapshot.data.data == null) {
+                    filteredMap = [];
+                  } else {
+                    filteredMap = snapshot.data.data
+                      ..removeWhere((key, value) => value == false);
+                  }
+                  follower = filteredMap.length;
+                }
+
+                return Text(
+                  '$follower\n팔로워',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(fontSize: 18.0),
+                );
+              }),
         ),
         Padding(
           padding: const EdgeInsets.only(top: 8.0),
-          child: Text(
-            '0\n팔로잉',
-            textAlign: TextAlign.center,
-            style: TextStyle(fontSize: 18.0),
-          ),
+          child: StreamBuilder<DocumentSnapshot>(
+              stream: _followingStream(),
+              builder: (context, snapshot) {
+                var following = 0;
+                if (snapshot.hasData) {
+                  var filteredMap;
+                  if (snapshot.data.data == null) {
+                    filteredMap = [];
+                  } else {
+                    filteredMap = snapshot.data.data
+                      ..removeWhere((key, value) => value == false);
+                  }
+                  following = filteredMap.length;
+                }
+                return Text(
+                  '$following\n팔로잉',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(fontSize: 18.0),
+                );
+              }),
         ),
       ],
     );
@@ -138,8 +180,28 @@ class AccountPage extends StatelessWidget {
   }
 
   // 내 게시물 가져오기
+  // DocumentSnapShot은 하나의 정보
+  // QuerySnapShot은 여러개의 정보
+  Stream<QuerySnapshot> _postStram() {
+    return Firestore.instance
+        .collection('post')
+        .where('email', isEqualTo: user.email)
+        .snapshots();
+  }
 
   // 팔로잉 가져오기
+  Stream<DocumentSnapshot> _followingStream() {
+    return Firestore.instance
+        .collection('following')
+        .document(user.email)
+        .snapshots();
+  }
 
   // 팔로워 가져오기
+  Stream<DocumentSnapshot> _followerStream() {
+    return Firestore.instance
+        .collection('follower')
+        .document(user.email)
+        .snapshots();
+  }
 }

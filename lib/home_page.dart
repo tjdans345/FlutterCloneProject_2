@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -23,7 +24,14 @@ class HomePage extends StatelessWidget {
 
   Widget _buildBody() {
     return SafeArea(
-      child: _buildNoPostBody(),
+      child: StreamBuilder<QuerySnapshot>(
+          stream: Firestore.instance.collection('post').snapshots(),
+          builder: (context, snapshot) {
+            if (!snapshot.hasData) {
+              return _buildNoPostBody();
+            }
+            return _buildHasPostBody(snapshot.data.documents);
+          }),
     );
   }
 
@@ -117,15 +125,18 @@ class HomePage extends StatelessWidget {
   }
 
   // 게시물이 있을 경우에 표시한 body
-  Widget _buildHasPostBody() {
+  Widget _buildHasPostBody(List<DocumentSnapshot> documents) {
     // 내 게시물 5개
-
+    final myPosts =
+        documents.where((doc) => doc['email'] == user.email).take(5).toList();
     // 다른 사람 게시물 10개
-
+    final otherPosts =
+        documents.where((doc) => doc['email'] != user.email).take(10).toList();
     // 합치기
+    myPosts.addAll(otherPosts);
 
     return ListView(
-      children: List.generate(10, (i) => i).map((doc) => FeedWidget()).toList(),
+      children: myPosts.map((doc) => FeedWidget(doc, user)).toList(),
     );
   }
 }
